@@ -1,0 +1,63 @@
+- name: instruments
+  extract:
+    class: SQLAlchemyDataSource
+    cli_vars:
+      uri: -s,--source
+    index:
+      - OPDATE
+
+    update_:
+    queries:
+      - name: basic
+        file: instruments.sql
+        query: |
+      SELECT S_INFO_WINDCODE         AS order_book_id,      # index: 1@1
+              B_INFO_PAYMENTSUM      AS cash_flow,          # type: float # na: 0  round: 6
+              B_INFO_PAYMENTDATE     AS payment_date,       # type: M  # index: 1@2
+              B_INFO_CARRYDATE       AS starting_date,      # type: M
+              B_INFO_ENDDATE         AS end_date,           # type: M
+              B_INFO_PAYMENTPARVALUE AS principal_payment,  # type: float # na: 0 # round: 6
+              B_INFO_PAYMENTINTEREST AS interest_payment    # type: float # na: 0 # round: 6
+      FROM CBONDCF {update};
+        update: WHERE OPDATE > '{update}'
+        stream: no
+
+      - name: cd_map
+        query:
+        use_pandas: yes
+        pandas_args:
+          parse_dates:
+
+
+
+  transform:
+    - from: basic
+      field: order_book_id
+      allow_na: yes
+      pipe:
+        - type: datetime
+        - replace_na: 0
+        - round: 6
+        - merge:
+            from: cd_map
+            args:
+              left_on:
+              right_one:
+
+
+  load:
+    mongodb: mongodb://
+    database:
+    collection:
+    index:
+      - name:
+        unique: no
+        fields:
+          - field: order_book_id
+            order: 1
+          - field: cash_flow
+            order: 1
+
+
+
+
