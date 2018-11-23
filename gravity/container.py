@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 
 if typing.TYPE_CHECKING:
     from typing import MutableMapping, AnyStr
-    from ._type import DataSourceType, DataFrameType
+    from ._type import DataSourceType, DataFrameType, EngineType, Engine
 
 
 __all__ = ("DataSource", "DataSourceMap", "DataSourceMeta")
@@ -51,7 +51,9 @@ DataSourceMap = Map()
 class DataSource(metaclass=DataSourceMeta):
     default_container = Container
 
-    def __init__(self, config: MutableMapping, container: MutableMapping = None) -> None:
+    def __init__(
+        self, config: MutableMapping, container: MutableMapping = None
+    ) -> None:
         self.config = config
         self._closed = True
         self._connected = False
@@ -74,9 +76,17 @@ class DataSource(metaclass=DataSourceMeta):
     def closed(self):
         return self._closed
 
+    @closed.setter
+    def closed(self, value):
+        self._closed = bool(value)
+
     @property
     def connected(self):
         return self._connected
+
+    @connected.setter
+    def connected(self, value):
+        self._connected = bool(value)
 
     def __iter__(self):
         if self.closed:
@@ -105,10 +115,10 @@ class DataSource(metaclass=DataSourceMeta):
 class SQLAlchemyDataSource(DataSource):
     def __init__(self, config, container=None):
         super().__init__(config)
-        self._engine = create_engine(config["uri"])
+        self._engine: Engine = create_engine(config["uri"])
         self._cursors = {}
         self._connections = {}
-
+    
     def connect(self):
         if self.connect:
             raise StatError("already connect")
@@ -121,6 +131,12 @@ class SQLAlchemyDataSource(DataSource):
                     query = f.read()
             else:
                 query = query["query"]
+
+            conn = self._engine.connect()
+            self._connections[name] = conn
+            cur = conn.execution_options(stream_results=True).execute(query)
+            self._cursors[name] = cur
+            
 
     def close(self):
         return

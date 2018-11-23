@@ -4,22 +4,36 @@
     cli_vars:
       uri: -s,--source
     index:
-      - OPDATE
+      - column:
+        order:
+      - column:
+        order:
 
-    update_:
+    recording:
+      class: ContentRecording
+      args:
+        uri: mongodb://localhost
+        database: datahub
+        collections: updatetime_record
+        content: instruments
+
     queries:
       - name: basic
         file: instruments.sql
         query: |
-      SELECT S_INFO_WINDCODE         AS order_book_id,      # index: 1@1
-              B_INFO_PAYMENTSUM      AS cash_flow,          # type: float # na: 0  round: 6
-              B_INFO_PAYMENTDATE     AS payment_date,       # type: M  # index: 1@2
-              B_INFO_CARRYDATE       AS starting_date,      # type: M
-              B_INFO_ENDDATE         AS end_date,           # type: M
-              B_INFO_PAYMENTPARVALUE AS principal_payment,  # type: float # na: 0 # round: 6
-              B_INFO_PAYMENTINTEREST AS interest_payment    # type: float # na: 0 # round: 6
-      FROM CBONDCF {update};
-        update: WHERE OPDATE > '{update}'
+          SELECT S_INFO_WINDCODE         AS order_book_id,      # index: 1@1
+                  B_INFO_PAYMENTSUM      AS cash_flow,          # type: float # na: 0  round: 6
+                  B_INFO_PAYMENTDATE     AS payment_date,       # type: M  # index: 1@2
+                  B_INFO_CARRYDATE       AS starting_date,      # type: M
+                  B_INFO_ENDDATE         AS end_date,           # type: M
+                  B_INFO_PAYMENTPARVALUE AS principal_payment,  # type: float # na: 0 # round: 6
+                  B_INFO_PAYMENTINTEREST AS interest_payment    # type: float # na: 0 # round: 6
+          FROM CBONDCF {update};
+        update: WHERE OPDATE > '{date}'
+
+
+
+
         stream: no
 
       - name: cd_map
