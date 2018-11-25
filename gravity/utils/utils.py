@@ -20,12 +20,7 @@ def _assure_index(engine, table, columns):
         for field in indexes[table]:
             if field in table_index:
                 continue
-            query = "CREATE INDEX %s__%s_index ON %s (%s)" % (
-                table,
-                field,
-                table,
-                field,
-            )
+            query = "CREATE INDEX %s__%s_index ON %s (%s)" % (table, field, table, field)
             logging.info("RUN: %s", query)
             r = engine.execute(query)
             r.close()
@@ -58,9 +53,7 @@ def ensure_dict_structure(
             ensure_dict_structure(d.get(k, {}), type_, absolute, error_class)
         elif isinstance(type_, list):
             if not isinstance(d[k], list):
-                raise error_class(
-                    "dict key %s should be %s, now got %s" % (k, list, d[k])
-                )
+                raise error_class("dict key %s should be %s, now got %s" % (k, list, d[k]))
             else:
                 type_ = type_[0]
                 for item in d[k]:

@@ -20,11 +20,7 @@ class Event:
     def __repr__(self):
         return "Event(%s)(%s)" % (
             self.type,
-            ", ".join(
-                "%s=%s" % (k, v)
-                for k, v in self.__dict__.items()
-                if not k.startswith("_")
-            ),
+            ", ".join("%s=%s" % (k, v) for k, v in self.__dict__.items() if not k.startswith("_")),
         )
 
 
@@ -46,14 +42,10 @@ class EventBus(Singleton):
     def push_event(self, event: Event):
         for i, run in self._events_map[event.type]:
             if not run(event):
-                event_logger.debug(
-                    "break when handle event=%s, func=(%s, %s)", event, i, run
-                )
+                event_logger.debug("break when handle event=%s, func=(%s, %s)", event, i, run)
                 break
 
-    def register(
-        self, event_type: str, func: Callable[[Event], bool], priority: int = 1
-    ):
+    def register(self, event_type: str, func: Callable[[Event], bool], priority: int = 1):
         ls: list = self._events_map[EVENTS[event_type]]
         for _, run in ls:
             if run is func:
@@ -61,9 +53,7 @@ class EventBus(Singleton):
         v = (priority, func)
         ls.append(v)
         ls.sort(key=itemgetter(0))
-        event_logger.debug(
-            "register event handle, type=%s, func=%s", EVENTS[event_type], func
-        )
+        event_logger.debug("register event handle, type=%s, func=%s", EVENTS[event_type], func)
         return ls.index(v)
 
     def index(self, event_type: str, func: Callable[[Event], bool]):

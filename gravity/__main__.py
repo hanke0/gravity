@@ -6,9 +6,7 @@ import click
 from gravity import __version__
 
 
-def mutually_exclusive_callback(
-    ctx: click.Context, param: click.Option, value: Optional[str]
-):
+def mutually_exclusive_callback(ctx: click.Context, param: click.Option, value: Optional[str]):
     if value is not None and ctx.params.get("file"):
         raise click.UsageError("Illegal usage: yaml is mutually exclusive with file")
     return value
@@ -16,9 +14,7 @@ def mutually_exclusive_callback(
 
 @click.command("gravity")
 @click.option("--file", "-f", required=False, type=click.File("rt", lazy=True))
-@click.argument(
-    "yaml", required=False, callback=mutually_exclusive_callback, type=click.STRING
-)
+@click.argument("yaml", required=False, callback=mutually_exclusive_callback, type=click.STRING)
 @click.version_option(__version__, "-v", "--version")
 @click.help_option("-h", "--help")
 def cli(yaml: Optional[str], file: Optional[TextIO]) -> None:
