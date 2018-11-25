@@ -1,77 +1,62 @@
-- name: instruments
-  extract:
-    class: SQLAlchemyDataSource
-    cli_vars:
-      uri: -s,--source
-    index:
-      - column:
-        order:
-      - column:
-        order:
+---
+name: instruments
+vars:
+  mongodb: &mongodb mongodb://localhost
+  foo: '{{mongodb}}'
 
-    recording:
-      class: ContentRecording
-      args:
-        uri: mongodb://localhost
-        database: datahub
-        collections: updatetime_record
-        content: instruments
+recording:
+  class: ContentRecording
+  uri: *mongodb
+  database: datahub
+  collections: updatetime_record
+  content: instruments
 
-    queries:
-      - name: basic
-        file: instruments.sql
-        query: |
-          SELECT S_INFO_WINDCODE         AS order_book_id,      # index: 1@1
-                  B_INFO_PAYMENTSUM      AS cash_flow,          # type: float # na: 0  round: 6
-                  B_INFO_PAYMENTDATE     AS payment_date,       # type: M  # index: 1@2
-                  B_INFO_CARRYDATE       AS starting_date,      # type: M
-                  B_INFO_ENDDATE         AS end_date,           # type: M
-                  B_INFO_PAYMENTPARVALUE AS principal_payment,  # type: float # na: 0 # round: 6
-                  B_INFO_PAYMENTINTEREST AS interest_payment    # type: float # na: 0 # round: 6
-          FROM CBONDCF {update};
-        update: WHERE OPDATE > '{date}'
+extract:
+  class: SQLAlchemyExtractor
+  index:
+    - column:
+      order:
+    - column:
+      order:
+  queries:
+    - name: basic
+      file: instruments.sql
+      query: >
+        SELECT  S_INFO_WINDCODE        AS order_book_id,
+                B_INFO_PAYMENTSUM      AS cash_flow,
+                B_INFO_PAYMENTDATE     AS payment_date,
+                B_INFO_CARRYDATE       AS starting_date,
+                B_INFO_ENDDATE         AS end_date,
+                B_INFO_PAYMENTPARVALUE AS principal_payment,
+                B_INFO_PAYMENTINTEREST AS interest_payment
+        FROM CBONDCF %(update)s;
+      update: WHERE OPDATE > '%(date)s'
+      stream: no
+    - name: ''
+      query:
+      use_pandas: yes
+      pandas_args:
+        parse_dates:
 
+transform:
+  - pipe: basic
+    field: order_book_id
+    allow_na: yes
 
-
-
-        stream: no
-
-      - name: cd_map
-        query:
-        use_pandas: yes
-        pandas_args:
-          parse_dates:
-
-
-
-  transform:
-    - from: basic
-      field: order_book_id
-      allow_na: yes
-      pipe:
-        - type: datetime
-        - replace_na: 0
-        - round: 6
-        - merge:
-            from: cd_map
-            args:
-              left_on:
-              right_one:
-
-
-  load:
-    mongodb: mongodb://
-    database:
-    collection:
-    index:
-      - name:
-        unique: no
-        fields:
-          - field: order_book_id
-            order: 1
-          - field: cash_flow
-            order: 1
-
-
-
+load:
+  class: MongodbLoader
+  uri: '{{foo}}/hello'
+  database:
+  collection:
+  index:
+    - name:
+      unique: no
+      fields:
+        - field: order_book_id
+          order: 1
+        - field: cash_flow
+          order: 1
+---
+hello: ---
+byte: 1
 

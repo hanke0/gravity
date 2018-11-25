@@ -1,3 +1,5 @@
 sqlalchemy
 pandas
 pymongo
+click
+pyyaml

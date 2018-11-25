@@ -2,10 +2,10 @@
 import os
 from setuptools import setup, find_packages
 
-
 def readfile(file):
     with open(file, "rt") as f:
         return f.read()
+
 
 with open(os.path.join("gravity", "version.py"), "rt") as f:
     d = {}
@@ -19,6 +19,7 @@ setup(
     packages=find_packages(),
     install_requires=readfile("requirements.txt").strip(),
     python_requires=">=3.4",
+    entry_points={"console_scripts": ["gravity=gravity.__main__:cli"]},
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",

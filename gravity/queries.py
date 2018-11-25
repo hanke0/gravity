@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from gravity.utils import create_mapped_meta_class
+from gravity.utils.utils import create_mapped_meta_class
 
 
 QueryMeta, QueryMap = create_mapped_meta_class("QueryMeta")

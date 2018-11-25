@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
-from gravity.utils import create_mapped_meta_class
+import abc
+
+from gravity.utils.utils import create_mapped_meta_class
 
 RecordingMeta, RecordingMap = create_mapped_meta_class("RecordingMeta")
 
 
 class Recording(metaclass=RecordingMeta):
-    def get_recording(self):
-        return
+    @abc.abstractmethod
+    def get(self):
+        raise NotImplementedError
 
-    def save_recording(self):
-        return
-
-    def format(self, queries):
-        return
+    @abc.abstractmethod
+    def save(self):
+        raise NotImplementedError
 
 
 class ContentRecording(Recording):
@@ -27,6 +28,3 @@ class ContentRecording(Recording):
 
     def format(self, queries):
         return
-
-
-print(RecordingMeta, Recording, RecordingMap)
