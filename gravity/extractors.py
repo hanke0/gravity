@@ -4,12 +4,7 @@ from sqlalchemy.engine import Engine
 
 from gravity.utils import create_mapped_meta_class
 
-ExtractorMeta, ExtractorMap = create_mapped_meta_class("ExtractorMeta")
 
-
-class Extractor(metaclass=ExtractorMeta):
-    def extract(self, recording):
-        raise NotImplementedError
 
 
 class SQLAlchemyExtractor(Extractor):

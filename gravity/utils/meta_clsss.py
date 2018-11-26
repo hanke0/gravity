@@ -13,6 +13,14 @@ class Map(dict):
     def __str__(self):
         return "%s%s" % (self.__class__.__name__, super().__str__())
 
+    def __getitem__(self, item):
+        try:
+            return super().__getitem__(item)
+        except KeyError as e:
+            msg = str(e)
+            e.args = ["Unsupported Key %s" % msg]
+            raise
+
 
 _meta_class_define_string = """
 class {}(abc.ABCMeta):
