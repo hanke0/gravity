@@ -3,6 +3,9 @@ import os
 from contextlib import contextmanager
 
 
+__all__ = ("chdir", "ensure_dict_structure")
+
+
 def get_table_index(table, engine):
     r = engine.execute("SHOW INDEX FROM %s" % table)
     d = []

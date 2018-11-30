@@ -9,6 +9,8 @@ __all__ = (
     "RecordingMap",
     "Extractor",
     "ExtractorMap",
+    "Transform",
+    "TransformMap",
     "Pipe",
     "PipeMap",
     "Loader",
@@ -37,8 +39,12 @@ class Recording(metaclass=RecordingMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def update(self, *args, **kwargs):
+    def update(self, **kwargs):
         """update records values"""
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def teardown(self):
         raise NotImplementedError
 
 
@@ -46,7 +52,12 @@ ExtractorMeta, ExtractorMap = create_mapped_meta_class("ExtractorMeta")
 
 
 class Extractor(metaclass=ExtractorMeta):
-    def extract(self, recording):
+    @abc.abstractmethod
+    def extract(self, recording: Recording):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def teardown(self):
         raise NotImplementedError
 
 
@@ -54,11 +65,36 @@ PipeMeta, PipeMap = create_mapped_meta_class("PipeMeta")
 
 
 class Pipe(metaclass=PipeMeta):
-    pass
+    @abc.abstractmethod
+    def __call__(self, *args, **kwargs):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def teardown(self):
+        raise NotImplementedError
+
+
+TransformMeta, TransformMap = create_mapped_meta_class("TransformMeta")
+
+
+class Transform(metaclass=TransformMeta):
+    @abc.abstractmethod
+    def transform(self, data):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def teardown(self):
+        raise NotImplementedError
 
 
 LoaderMeta, LoaderMap = create_mapped_meta_class("Loader")
 
 
 class Loader(metaclass=LoaderMeta):
-    pass
+    @abc.abstractmethod
+    def load(self, data):
+        return
+
+    @abc.abstractmethod
+    def teardown(self):
+        raise NotImplementedError

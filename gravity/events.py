@@ -1,8 +1,10 @@
+import enum
+
 from typing import Callable, MutableMapping, List
 from operator import itemgetter
 
-from gravity.utils import SimpleEnum, Singleton
-from gravity.logger import event_logger
+from gravity.utils import Singleton
+from gravity.logger import GravityLogger
 
 __all__ = ("EVENTS", "Event", "EventBus")
 
@@ -24,7 +26,7 @@ class Event:
         )
 
 
-class EVENTS(SimpleEnum):
+class EVENTS(enum.Enum):
     STARTUP = "startup"
     RENDER = "render"
     EXTRACT = "extract"
@@ -42,7 +44,7 @@ class EventBus(Singleton):
     def push_event(self, event: Event):
         for i, run in self._events_map[event.type]:
             if not run(event):
-                event_logger.debug("break when handle event=%s, func=(%s, %s)", event, i, run)
+                GravityLogger.debug("break when handle event=%s, func=(%s, %s)", event, i, run)
                 break
 
     def register(self, event_type: str, func: Callable[[Event], bool], priority: int = 1):
@@ -53,7 +55,7 @@ class EventBus(Singleton):
         v = (priority, func)
         ls.append(v)
         ls.sort(key=itemgetter(0))
-        event_logger.debug("register event handle, type=%s, func=%s", EVENTS[event_type], func)
+        GravityLogger.debug("register event handle, type=%s, func=%s", EVENTS[event_type], func)
         return ls.index(v)
 
     def index(self, event_type: str, func: Callable[[Event], bool]):

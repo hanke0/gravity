@@ -2,9 +2,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 
-from gravity.utils import create_mapped_meta_class
-
-
+from gravity.interface import Extractor
 
 
 class SQLAlchemyExtractor(Extractor):

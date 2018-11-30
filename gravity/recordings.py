@@ -1,15 +1,18 @@
 from gravity.interface import Recording
 
 
+__all__ = ("ContentRecording",)
+
+
 class ContentRecording(Recording):
     def __init__(self, uri, database, collection, content):
         return
 
-    def get_recording(self):
+    def retrieve(self):
         return
 
-    def save_recording(self):
+    def update(self, **kwargs):
         return
 
-    def format(self, queries):
+    def keep(self):
         return

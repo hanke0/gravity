@@ -13,13 +13,14 @@ with open(os.path.join("gravity", "version.py"), "rt") as f:
     exec(f.read(), d, d)
     version = d["__version__"]
 
+requires = ["pymong", "sqlalchymy", "pandas"]
+
 setup(
     name="gravity",
     version=version,
     include_package_data=True,
     packages=find_packages(),
-    install_requires=readfile("requirements.txt").strip(),
-    python_requires=">=3.4",
+    install_requires=[],
     entry_points={"console_scripts": ["gravity=gravity.__main__:cli"]},
     classifiers=[
         "Programming Language :: Python",
